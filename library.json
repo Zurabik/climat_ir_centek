@@ -1,0 +1,26 @@
+{
+  "name": "Centek IR Climate",
+  "version": "1.0.0",
+  "keywords": "esphome, climate, ir, centek, air conditioner",
+  "description": "ESPHome component for Centek air conditioners",
+  "authors": [
+    {
+      "name": "Your Name",
+      "email": "your.email@example.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/centek-ir-climate"
+  },
+  "export": {
+    "include": [
+      "components/*/*.h",
+      "components/*/*.cpp",
+      "components/*/*.py"
+    ]
+  },
+  "dependencies": {
+    "esphome": ">=2023.12.0"
+  }
+}
