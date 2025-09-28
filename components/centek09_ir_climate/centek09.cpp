@@ -1,4 +1,4 @@
-#include "Centek09.h"
+#include "centek09.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
