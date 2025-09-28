@@ -5,7 +5,7 @@ namespace esphome {
 namespace Centek09 {
 
 static const char *const TAG = "Centek09.climate";
-
+//тайминги ик протокола NEC-образный
 const uint16_t BALLU_HEADER_MARK = 9000;
 const uint16_t BALLU_HEADER_SPACE = 4500;
 const uint16_t BALLU_BIT_MARK = 575;
@@ -14,22 +14,31 @@ const uint16_t BALLU_ZERO_SPACE = 550;
 
 const uint32_t BALLU_CARRIER_FREQUENCY = 38000;
 
-const uint8_t BALLU_STATE_LENGTH = 13;
+const uint8_t BALLU_STATE_LENGTH = 13;//количество байт в посылке
 
 const uint8_t BALLU_AUTO = 0;
-const uint8_t BALLU_COOL = 0x20;
-const uint8_t BALLU_DRY = 0x40;
-const uint8_t BALLU_HEAT = 0x80;
-const uint8_t BALLU_FAN = 0xc0;
+const uint8_t BALLU_COOL = 0x20;//32
+const uint8_t BALLU_DRY = 0x40;//64
+const uint8_t BALLU_HEAT = 0x80;//128
+const uint8_t BALLU_FAN = 0xc0;//192
 
-const uint8_t BALLU_FAN_AUTO = 0xa0;
-const uint8_t BALLU_FAN_HIGH = 0x20;
-const uint8_t BALLU_FAN_MED = 0x40;
-const uint8_t BALLU_FAN_LOW = 0x60;
+const uint8_t BALLU_FAN_AUTO = 0xa0; //160
+const uint8_t BALLU_FAN_TURBO = 0x20; //32 + 64 в 5 байте
 
-const uint8_t BALLU_SWING_VER = 0x07;
-const uint8_t BALLU_SWING_HOR = 0xe0;
-const uint8_t BALLU_POWER = 0x20;
+const uint8_t BALLU_FAN_HIGH = 0x20; //32
+const uint8_t BALLU_FAN_MED = 0x40; //64
+const uint8_t BALLU_FAN_LOW = 0x60; //96
+
+const uint8_t BALLU_SWING_VER = 0x07; //00000111 
+const uint8_t BALLU_SWING_HOR = 0xe0; //224 11100000
+const uint8_t BALLU_IFEEL = 0x40; //64 01000000 нужно добавить функцию ifeel
+
+const uint8_t BALLU_POWER = 0x20; //32 в 9 байт
+
+const uint8_t BALLU_TIMER_MODE_OFF = 0x70; //01000000 9B
+const uint8_t BALLU_TIMER_MODE_ON = 0x80; //10000000 9B
+const uint8_t BALLU_TIMER_HOUR = 0x00; // 4байт 0-24
+const uint8_t BALLU_TIMER_MIN = 0x00; // 5байт 0-59 
 
 void Centek09Climate::transmit_state() {
   uint8_t remote_state[BALLU_STATE_LENGTH] = {0};
@@ -41,15 +50,17 @@ void Centek09Climate::transmit_state() {
       ((this->swing_mode == climate::CLIMATE_SWING_HORIZONTAL) || (this->swing_mode == climate::CLIMATE_SWING_BOTH));
 
   remote_state[0] = 0xc3;
-  remote_state[1] = ((temp - 8) << 3) | (swing_ver ? 0 : BALLU_SWING_VER);
-  remote_state[2] = swing_hor ? 0 : BALLU_SWING_HOR;
+  remote_state[1] = ((temp - 8) << 3) | (swing_ver ? 0 : BALLU_SWING_VER);//настройка температуры и жалюзи верт
+  remote_state[2] = swing_hor ? 0 : BALLU_SWING_HOR;//жалюзи горизонтальные
   remote_state[9] = (this->mode == climate::CLIMATE_MODE_OFF) ? 0 : BALLU_POWER;
-  remote_state[11] = 0x1e;
+  remote_state[11] = 0x1e;//тут код нажатой кнопки должен быть
 
   // Fan speed
   switch (this->fan_mode.value()) {
     case climate::CLIMATE_FAN_HIGH:
       remote_state[4] |= BALLU_FAN_HIGH;
+      //remote_state[5] &= ~( (1 << 7) | (1 << 7) );
+      //remote_state[5] &= ~( 1 << 7);//сброс турбо на всякий случай 
       break;
     case climate::CLIMATE_FAN_MEDIUM:
       remote_state[4] |= BALLU_FAN_MED;
@@ -59,6 +70,14 @@ void Centek09Climate::transmit_state() {
       break;
     case climate::CLIMATE_FAN_AUTO:
       remote_state[4] |= BALLU_FAN_AUTO;
+      break;
+    case climate::CLIMATE_FAN_TURBO:
+      remote_state[4] |= BALLU_FAN_HIGH;
+      remote_state[5] |= 0x40;//6бит в 5 байте для режима турбо
+      break;
+    case climate::CLIMATE_FAN_SILENCE:
+      remote_state[4] |= BALLU_FAN_LOW;
+      remote_state[5] |= 0x80;//7бит в 5 байте для режима SILENCE
       break;
     default:
       break;
