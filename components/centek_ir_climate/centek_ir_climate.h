@@ -36,12 +36,8 @@ class CentekIRClimate : public climate::Climate, public Component {
   uint32_t bit_mark_, one_space_, zero_space_;
   remote_transmitter::RemoteTransmitterComponent *transmitter_;
   
-  // Состояние кондиционера Centek
+  // Убрали дублирующие переменные, используем унаследованные от climate::Climate
   bool power_{false};
-  climate::ClimateMode mode_{climate::CLIMATE_MODE_OFF};
-  float target_temperature_{22.0};
-  climate::ClimateFanMode fan_mode_{climate::CLIMATE_FAN_AUTO};
-  climate::ClimateSwingMode swing_mode_{climate::CLIMATE_SWING_OFF};
 };
 
 }  // namespace centek_ir_climate
