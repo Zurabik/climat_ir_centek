@@ -7,6 +7,8 @@ namespace centek_ir_climate {
 void CentekIRClimate::setup() {
   this->target_temperature = 22.0;
   this->mode = climate::CLIMATE_MODE_OFF;
+  this->fan_mode = climate::CLIMATE_FAN_AUTO;
+  this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
 }
 
 climate::ClimateTraits CentekIRClimate::traits() {
