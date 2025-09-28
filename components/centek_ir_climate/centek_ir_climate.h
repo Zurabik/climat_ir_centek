@@ -10,6 +10,9 @@ namespace centek_ir_climate {
 
 class CentekIRClimate : public climate::Climate, public Component {
  public:
+  void set_transmitter(remote_transmitter::RemoteTransmitterComponent *transmitter) { 
+    transmitter_ = transmitter; 
+  }
   void set_protocol(const std::string &protocol) { protocol_ = protocol; }
   void set_centek_code(uint32_t code) { centek_code_ = code; }
   void set_bit_length(uint8_t length) { bit_length_ = length; }
@@ -18,7 +21,6 @@ class CentekIRClimate : public climate::Climate, public Component {
   void set_bit_mark(uint32_t mark) { bit_mark_ = mark; }
   void set_one_space(uint32_t space) { one_space_ = space; }
   void set_zero_space(uint32_t space) { zero_space_ = space; }
-  void set_transmitter(remote_transmitter::RemoteTransmitterComponent *transmitter) { transmitter_ = transmitter; }
 
   void setup() override;
   climate::ClimateTraits traits() override;
@@ -26,7 +28,6 @@ class CentekIRClimate : public climate::Climate, public Component {
 
  protected:
   void send_ir_command_();
-  void transmit_(remote_base::RemoteTransmitData *data);
   
   std::string protocol_;
   uint32_t centek_code_;
