@@ -44,7 +44,6 @@ climate::ClimateTraits CentekIRClimate::traits() {
 }
 
 void CentekIRClimate::control(const climate::ClimateCall &call) {
-  // Обработка изменений
   if (call.get_mode().has_value()) {
     this->mode = *call.get_mode();
     this->power_ = (this->mode != climate::CLIMATE_MODE_OFF);
@@ -70,7 +69,12 @@ void CentekIRClimate::control(const climate::ClimateCall &call) {
 }
 
 void CentekIRClimate::send_ir_command_() {
-  auto transmit = this->transmitter_->transmit();
+  if (transmitter_ == nullptr) {
+    ESP_LOGE("centek", "Transmitter not set!");
+    return;
+  }
+  
+  auto transmit = transmitter_->transmit();
   auto *data = transmit.get_data();
   
   // Заголовок пакета для Centek
@@ -87,19 +91,19 @@ void CentekIRClimate::send_ir_command_() {
   // Режим работы Centek
   switch (mode_) {
     case climate::CLIMATE_MODE_HEAT:
-      command |= 0x01000000;  // Heat mode
+      command |= 0x01000000;
       break;
     case climate::CLIMATE_MODE_COOL:
-      command |= 0x02000000;  // Cool mode
+      command |= 0x02000000;
       break;
     case climate::CLIMATE_MODE_DRY:
-      command |= 0x03000000;  // Dry mode
+      command |= 0x03000000;
       break;
     case climate::CLIMATE_MODE_FAN_ONLY:
-      command |= 0x04000000;  // Fan mode
+      command |= 0x04000000;
       break;
     case climate::CLIMATE_MODE_AUTO:
-      command |= 0x05000000;  // Auto mode
+      command |= 0x05000000;
       break;
   }
   
@@ -110,16 +114,16 @@ void CentekIRClimate::send_ir_command_() {
   // Скорость вентилятора Centek
   switch (fan_mode_) {
     case climate::CLIMATE_FAN_AUTO:
-      command |= 0x00;  // Auto fan
+      command |= 0x00;
       break;
     case climate::CLIMATE_FAN_LOW:
-      command |= 0x10;  // Low fan
+      command |= 0x10;
       break;
     case climate::CLIMATE_FAN_MEDIUM:
-      command |= 0x20;  // Medium fan
+      command |= 0x20;
       break;
     case climate::CLIMATE_FAN_HIGH:
-      command |= 0x30;  // High fan
+      command |= 0x30;
       break;
   }
   
@@ -142,19 +146,11 @@ void CentekIRClimate::send_ir_command_() {
     data->item(bit_mark_, bit ? one_space_ : zero_space_);
   }
   
-  // Завершающий бит для Centek
+  // Завершающий бит
   data->item(bit_mark_, 0);
   
   transmit.perform();
-  
-  // Логирование для отладки
   ESP_LOGD("centek", "Sent Centek command: 0x%08X", command);
-}
-
-void CentekIRClimate::transmit_(remote_base::RemoteTransmitData *data) {
-  if (this->transmitter_ != nullptr) {
-    this->transmitter_->transmit(*data);
-  }
 }
 
 }  // namespace centek_ir_climate
