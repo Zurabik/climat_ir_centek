@@ -71,11 +71,11 @@ void Centek09Climate::transmit_state() {
     case climate::CLIMATE_FAN_AUTO:
       remote_state[4] |= BALLU_FAN_AUTO;
       break;
-    case climate::CLIMATE_FAN_TURBO:
+    case climate::CLIMATE_FAN_FOCUS:
       remote_state[4] |= BALLU_FAN_HIGH;
       remote_state[5] |= 0x40;//6бит в 5 байте для режима турбо
       break;
-    case climate::CLIMATE_FAN_SILENCE:
+    case climate::CLIMATE_FAN_QUIET:
       remote_state[4] |= BALLU_FAN_LOW;
       remote_state[5] |= 0x80;//7бит в 5 байте для режима SILENCE
       break;
