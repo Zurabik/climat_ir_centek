@@ -15,10 +15,10 @@ const float YKR_T_121E_TEMP_MAX = 32.0;
 
 // Fan mode
 enum SetFanMode {
-  MITSUBISHI_FAN_3L = 0,  // 3 levels + auto
-  MITSUBISHI_FAN_4L,      // 4 levels + auto
-  MITSUBISHI_FAN_Q4L,     // Quiet + 4 levels + auto
-  //  MITSUBISHI_FAN_5L,      // 5 levels + auto
+  CENTEK09_FAN_3L = 0,  // 3 levels + auto
+  CENTEK09_FAN_4L,      // 4 levels + auto
+  CENTEK09_FAN_Q4L,     // Quiet + 4 levels + auto
+  //  CENTEK09_FAN_5L,      // 5 levels + auto
 };
 
 // Enum to represent horizontal directios
