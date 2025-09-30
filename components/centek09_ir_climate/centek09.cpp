@@ -86,8 +86,9 @@ void Centek09Climate::transmit_state() {
   auto temp = (uint8_t) roundf(clamp(this->target_temperature, YKR_T_121E_TEMP_MIN, YKR_T_121E_TEMP_MAX));
   auto swing_ver =
       ((this->swing_mode == climate::CLIMATE_SWING_VERTICAL) || (this->swing_mode == climate::CLIMATE_SWING_BOTH));
-  auto swing_hor =
-      ((this->swing_mode == climate::CLIMATE_SWING_HORIZONTAL) || (this->swing_mode == climate::CLIMATE_SWING_BOTH));
+  //пробую выключить горизонтальные жалюзи
+  //auto swing_hor =
+  //    ((this->swing_mode == climate::CLIMATE_SWING_HORIZONTAL) || (this->swing_mode == climate::CLIMATE_SWING_BOTH));
 
   remote_state[0] = 0xc3;
   remote_state[1] = ((temp - 8) << 3) | (swing_ver ? 0 : BALLU_SWING_VER);//настройка температуры и жалюзи верт
